@@ -1,0 +1,407 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fores Community</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+        header {
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+        }
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+            margin: 0;
+            padding: 0;
+        }
+        nav ul li a {
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+        }
+        .logo {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+        .sidebar {
+            position: fixed;
+            left: -250px;
+            top: 0;
+            width: 250px;
+            height: 100%;
+            background-color: #fff;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            transition: left 0.3s ease;
+        }
+        .sidebar.active {
+            left: 0;
+        }
+        .sidebar ul {
+            list-style: none;
+            padding: 20px;
+            margin: 0;
+        }
+        .sidebar ul li {
+            margin: 10px 0;
+        }
+        .sidebar ul li a {
+            text-decoration: none;
+            color: #333;
+        }
+        .hamburger {
+            display: none;
+            font-size: 1.5em;
+            cursor: pointer;
+        }
+        section {
+            padding: 80px 20px;
+            text-align: center;
+        }
+        #home {
+            background-color: #fff;
+            padding: 100px 20px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #ff6347;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .card {
+            background-color: #fff;
+            padding: 20px;
+            margin: 10px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: inline-block;
+            width: 100%;
+            max-width: 300px;
+            vertical-align: top;
+        }
+        .card a {
+            color: #ff6347;
+            text-decoration: none;
+        }
+        .form-group {
+            margin: 10px 0;
+        }
+        .form-group input {
+            padding: 10px;
+            width: 100%;
+            max-width: 300px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+        @media (max-width: 768px) {
+            nav ul {
+                display: none;
+            }
+            .hamburger {
+                display: block;
+            }
+            .sidebar {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">Fores Community</div>
+            <ul>
+                <li><a href="#vision-mission">Visi & Misi</a></li>
+                <li><a href="#vip">Member VIP</a></li>
+                <li><a href="countdown.html">Countdown Event</a></li>
+            </ul>
+            <div class="hamburger">☰</div>
+        </nav>
+        <div class="sidebar">
+            <ul>
+                <li><a href="#about">Tentang Kami</a></li>
+                <li><a href="#vision-mission">Visi & Misi</a></li>
+                <li><a href="#vip">Member VIP</a></li>
+                <li><a href="#clinic">Lokasi Klinik</a></li>
+                <li><a href="#event">Event Komunitas</a></li>
+                <li><a href="#steril">Steril</a></li>
+                <li><a href="#adoption">Adopsi</a></li>
+                <li><a href="#vaccine">Vaksin</a></li>
+                <li><a href="#group">Grup</a></li>
+                <li><a href="#treatment">Pengobatan</a></li>
+                <li><a href="#rescue">Laporan Rescue</a></li>
+                <li><a href="#shelter">Shelter</a></li>
+                <li><a href="#collaboration">Kolaborasi</a></li>
+                <li><a href="#education">Edukasi</a></li>
+                <li><a href="countdown.html">Countdown Event</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <section id="home">
+        <h1>Welcome to Fores Community!</h1>
+        <p>Meow! Komunitas kucing terlucu buat pecinta anabul!</p>
+        <a href="#vip" class="btn">Join Meow VIP!</a>
+    </section>
+
+    <section id="vision-mission">
+        <h2>Visi & Misi Kami</h2>
+        <p>Meow! Bersama kita wujudkan dunia yang lebih baik untuk anabul!</p>
+        <div class="card">
+            <h3>Visi</h3>
+            <p>Menjadi komunitas kucing terbesar yang penuh cinta, mendukung kesejahteraan anabul di seluruh dunia!</p>
+        </div>
+        <div class="card">
+            <h3>Misi</h3>
+            <p>
+                🐾 Edukasi pecinta kucing tentang perawatan terbaik.<br>
+                🐾 Selamatkan dan adopsi kucing terlantar.<br>
+                🐾 Wujudkan lingkungan ramah kucing dengan steril dan vaksin.<br>
+                🐾 Bangun komunitas seru penuh kasih sayang!
+            </p>
+        </div>
+    </section>
+
+    <section id="steril">
+        <h2>Steril Kucing</h2>
+        <p>Bikin anabul sehat dan bahagia dengan steril! Meow!</p>
+        <div class="card">
+            <h3>Manfaat Steril</h3>
+            <p>Cegah overpopulasi dan bikin kucing lebih tenang!</p>
+            <a href="#">Lihat Detail</a>
+        </div>
+        <div class="card">
+            <h3>Jadwal Steril</h3>
+            <p>Cek jadwal steril di komunitas kami!</p>
+            <a href="#">Lihat Jadwal</a>
+        </div>
+        <div class="card">
+            <h3>Biaya Terjangkau</h3>
+            <p>Steril murah, kucing senang, dompet aman!</p>
+            <a href="#">Lihat Biaya</a>
+        </div>
+    </section>
+
+    <section id="vip">
+        <h2>Jadi Member VIP!</h2>
+        <p>Dapatkan keuntungan eksklusif buat kamu dan anabulmu!</p>
+        <div class="card">
+            <h3>Form Join VIP</h3>
+            <div class="form-group">
+                <input type="text" placeholder="Nama">
+            </div>
+            <div class="form-group">
+                <input type="text" placeholder="Nomor WhatsApp">
+            </div>
+            <div class="form-group">
+                <input type="text" placeholder="Nama Kucing">
+            </div>
+            <a href="#" class="btn">Kirim ke WhatsApp</a>
+        </div>
+    </section>
+
+    <section id="clinic">
+        <h2>Lokasi Klinik Mitra</h2>
+        <p>Meow! Temukan klinik terdekat untuk anabulmu!</p>
+        <div class="card">
+            <h3>Klinik Anabul Sehat</h3>
+            <p>Jl. Kucing Bahagia No. 123, Jakarta</p>
+            <a href="#" class="btn">Hubungi</a>
+        </div>
+        <div class="card">
+            <h3>Pusat Kucing Bahagia</h3>
+            <p>Jl. Meow Meow No. 45, Bandung</p>
+            <a href="#" class="btn">Hubungi</a>
+        </div>
+        <div class="card">
+            <h3>Rumah Anabul</h3>
+            <p>Jl. Purrfect No. 78, Surabaya</p>
+            <a href="#" class="btn">Hubungi</a>
+        </div>
+    </section>
+
+    <section id="event">
+        <h2>Event Komunitas</h2>
+        <p>Meow! Ikut acara seru bareng pecinta anabul!</p>
+        <div class="card">
+            <h3>Gathering Cat Lovers</h3>
+            <p>Tanggal: 25 Juni 2025</p>
+            <p>Lokasi: Taman Kucing, Jakarta</p>
+            <p>Acara seru buat sharing dan main bareng anabul!</p>
+            <a href="#" class="btn">Daftar Sekarang</a>
+        </div>
+        <div class="card">
+            <h3>Webinar Kesehatan Kucing</h3>
+            <p>Tanggal: 2 Juli 2025</p>
+            <p>Platform: Zoom</p>
+            <p>Belajar tips merawat anabul dari dokter hewan!</p>
+            <a href="#" class="btn">Daftar Sekarang</a>
+        </div>
+    </section>
+
+    <section id="adoption">
+        <h2>Adopsi Kucing</h2>
+        <p>Berikan rumah hangat untuk anabul yang butuh kasih sayang!</p>
+        <div class="card">
+            <h3>Kucing Lucu</h3>
+            <p>Adopsi kucing imut yang siap jadi temen main!</p>
+        </div>
+        <div class="card">
+            <h3>Proses Mudah</h3>
+            <p>Isi form adopsi, kami bantu prosesnya!</p>
+        </div>
+        <div class="card">
+            <h3>Follow-Up</h3>
+            <p>Kami pantau kucingmu setelah adopsi!</p>
+        </div>
+    </section>
+
+    <section id="vaccine">
+        <h2>Vaksin Kucing</h2>
+        <p>Jaga anabul tetap sehat dengan vaksin rutin!</p>
+        <div class="card">
+            <h3>Jenis Vaksin</h3>
+            <p>Kami sediakan vaksin F3, F4, dan rabies untuk kucingmu!</p>
+        </div>
+        <div class="card">
+            <h3>Jadwal Vaksin</h3>
+            <p>Cek jadwal vaksin bulanan di komunitas kami!</p>
+        </div>
+    </section>
+
+    <section id="group">
+        <h2>Grup Komunitas</h2>
+        <p>Gabung grup seru buat sharing tentang anabul!</p>
+        <a href="#" class="btn">Join Grup WhatsApp</a>
+    </section>
+
+    <section id="treatment">
+        <h2>Pengobatan Kucing</h2>
+        <p>Kami bantu anabul sembuh dengan cinta!</p>
+        <div class="card">
+            <h3>Konsultasi Dokter</h3>
+            <p>Dokter hewan siap bantu kucingmu!</p>
+        </div>
+        <div class="card">
+            <h3>Perawatan Intensif</h3>
+            <p>Perawatan khusus untuk anabul yang sakit.</p>
+        </div>
+    </section>
+
+    <section id="rescue">
+        <h2>Rescue Kucing</h2>
+        <p>Kami selamatkan kucing yang membutuhkan!</p>
+        <div class="card">
+            <h3>Laporan Rescue</h3>
+            <p>Laporkan kucing terlantar, kami tim rescue!</p>
+            <a href="#" class="btn">Laporkan Sekarang</a>
+        </div>
+        <div class="card">
+            <h3>Shelter Sementara</h3>
+            <p>Kami rawat sampai dapat rumah baru!</p>
+            <a href="#" class="btn">Lihat Shelter</a>
+        </div>
+        <div class="card">
+            <h3>Kolaborasi</h3>
+            <p>Kerja sama dengan komunitas lain!</p>
+            <a href="#" class="btn">Ajukan Kolaborasi</a>
+        </div>
+    </section>
+
+    <section id="education">
+        <h2>Edukasi Kucing</h2>
+        <p>Belajar jadi cat parent yang kece!</p>
+        <div class="card">
+            <h3>Artikel</h3>
+            <p>Baca tips merawat kucing!</p>
+        </div>
+        <div class="card">
+            <h3>Webinar</h3>
+            <p>Ikuti webinar seru tentang anabul!</p>
+        </div>
+        <div class="card">
+            <h3>Sharing</h3>
+            <p>Tukar pengalaman dengan cat lover!</p>
+        </div>
+    </section>
+
+    <footer>
+        <p>© 2025 Fores Community. Meow with Love!</p>
+        <a href="#" class="btn">Back to Top</a>
+    </footer>
+
+    <script>
+        const hamburger = document.querySelector('.hamburger');
+        const sidebar = document.querySelector('.sidebar');
+
+        hamburger.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+        });
+    </script>
+</body>
+</html>
